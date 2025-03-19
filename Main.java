@@ -220,7 +220,6 @@ public class Main {
         for (int num = 1; num <= 9; num++) {
             if (possible[num]) validNumbers.add(num);
         }
-
         // Convert List<Integer> to int[]
         return validNumbers.stream().mapToInt(Integer::intValue).toArray();
     }
@@ -244,7 +243,8 @@ public class Main {
 
     static int[] cellWithMinValueInPMatrix(int[][] board) {
         update_pmatrix(board);
-        int minValueInPMatrix = 10, min_i = 0, min_j = 0;
+        int minValueInPMatrix = 10, min_i = 0, min_j = 0; // Use -1 to detect errors
+    
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
                 if (pmatrix[i][j] < minValueInPMatrix && pmatrix[i][j] > 0) {
@@ -254,13 +254,15 @@ public class Main {
                 }
             }
         }
+    
         return new int[]{min_i, min_j, minValueInPMatrix}; 
     }
 
     public static void main(String[] args) {
         ArrayDeque<StackItem> stack = new ArrayDeque<>();
-        int board[][] = Boards.sudoku_board_2;
-        while (!isSolved(board)) {
+        int board[][] = Boards.sudoku_board_9;
+        update_pmatrix(board);
+         while (!isSolved(board)) {
             int[] cellWithMinValue = cellWithMinValueInPMatrix(board);
             int i = cellWithMinValue[0];
             int j = cellWithMinValue[1];
@@ -268,40 +270,36 @@ public class Main {
             int[] pnum = possible_num(board, i, j);
             outerLoop:
             for (int num = board[i][j] + 1; num < 10; num++) {
-                boolean found2 = false;
                 for (int n : pnum) {
                     if (n == num) {
-                        found2 = true;
-                        break;
-                    }
-                }
-                if (found2) {
-                    if (!stack.isEmpty()) {
-                        StackItem top = stack.peek();
-                        ArrayList<int[]> arrayList = top.list;
-                        for (int[] arr : arrayList) {
-                            if (arr.length == 3 && arr[0] == i && arr[1] == j && arr[2] == num) {
-                                continue outerLoop;
+                        // Check if the number already exists in the stack
+                        if (!stack.isEmpty()) {
+                            StackItem top = stack.peek();
+                            ArrayList<int[]> arrayList = top.list;
+                            for (int[] arr : arrayList) {
+                                if (arr.length == 3 && arr[0] == i && arr[1] == j && arr[2] == num) {
+                                    continue outerLoop;
+                                }
                             }
                         }
+                        // Place the number and push to stack
+                        board[i][j] = num;
+                        stack.push(new StackItem(i, j, num, new ArrayList<>()));
+                        printSudoku(board);
+                        found = true;
+                        break outerLoop;
                     }
-                    board[i][j] = num;
-                    stack.push(new StackItem(i, j, num, new ArrayList<>()));
-                    printSudoku(board);
-                    found = true;
-                    break;
                 }
             }
             if (!found) {
                 StackItem topPrev = stack.pop();
-                board[i][j] = 0;
+                board[topPrev.i][topPrev.j] = 0;
                 if (!stack.isEmpty()) {
                     StackItem topNow = stack.peek();
-                    System.out.println("Top of stack after pop: " + topNow.i + ", " + topNow.j + ", " + topNow.num + ", " + topNow.list);
                     topNow.list.add(new int[] {topPrev.i, topPrev.j, topPrev.num});
                 }
             }
-        }
+        } 
     }
   }
   
