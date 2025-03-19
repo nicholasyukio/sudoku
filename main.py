@@ -197,7 +197,7 @@ def solver(board):
     possible_num_qtd = 1
     #empty_cells = [(r, c) for r in range(9) for c in range(9) if board[r][c] == 0]
     while not is_solved():
-        changed_num = 0
+        #changed_num = 0
         #print(f"Stack: {stack}")
         i, j, p = cell_with_min_value_in_pmatrix()
         #print(f"Cell with min value in pmatrix: ({i}, {j}): {p}")
@@ -212,7 +212,7 @@ def solver(board):
                 board[i][j] = num
                 stack.append([i, j, num, []])
                 print_sudoku(board)
-                changed_num += 1
+                #changed_num += 1
                 found = True
                 break
         if found:
@@ -230,4 +230,4 @@ def solver(board):
                 if stack:
                     stack[-1][3].append([i, j, prev_num])
 
-solver(sudoku_board_very_challenging)
+solver(sudoku_board_2)
